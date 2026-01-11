@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteVision‑Check – Soll ich AR auf meiner Baustelle einsetzen?</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body {
+            background: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+        h1 {
+            color: #005aa3;
+            font-size: 22px;
+            margin-top: 0;
+            text-align: center;
+        }
+        .question {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+        .question.active {
+            display: block;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        .options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .option {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .option:hover {
+            border-color: #005aa3;
+            background: #f0f7ff;
+        }
+        .option.selected {
+            border-color: #005aa3;
+            background: #005aa3;
+            color: white;
+        }
+        button {
+            background: #005aa3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #004080;
+        }
+        button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+        .result {
+            display: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .result.good {
+            background: #e7f7e9;
+            border: 2px solid #2ecc71;
+        }
+        .result.bad {
+            background: #ffeaea;
+            border: 2px solid #e74c3c;
+        }
+        .result-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .result-list {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        .result-list li {
+            margin-bottom: 8px;
+        }
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SiteVision‑Check – Soll ich AR auf meiner Baustelle einsetzen?</h1>
+        <div class="progress">Frage <span id="current">1</span> von 4</div>
+
+        <!-- Frage 1 – Sai -->
+        <div class="question active" id="q1">
+            <div class="question-text">1. Haben Sie ein aktuelles, qualitativ hochwertiges BIM‑Modell (IFC)?</div>
+            <div class="options">
+                <div class="option" data-value="ja">Ja</div>
+                <div class="option" data-value="nein">Nein</div>
+            </div>
+            <button id="next1" disabled>Weiter</button>
+        </div>
+
+        <!-- Frage 2 – Mohammad -->
+        <div class="question" id="q2">
+            <div class="question-text">2. Können Sie SiteVision in Ihre bestehenden Bauabstimmungen integrieren?</div>
+            <div class="options">
+                <div class="option" data-value="ja">Ja</div>
+                <div class="option" data-value="nein">Nein</div>
+            </div>
+            <button id="next2" disabled>Weiter</button>
+        </div>
+
+        <!-- Frage 3 – Betina -->
+        <div class="question" id="q3">
+            <div class="question-text">3. Ist Ihr Team digital affin und bereit für ein neues AR‑Tool?</div>
+            <div class="options">
+                <div class="option" data-value="ja">Ja</div>
+                <div class="option" data-value="nein">Nein</div>
+            </div>
+            <button id="next3" disabled>Weiter</button>
+        </div>
+
+        <!-- Frage 4 – Oussama -->
+        <div class="question" id="q4">
+            <div class="question-text">4. Gibt es räumlich komplexe Koordinationsprobleme auf Ihrer Baustelle?</div>
+            <div class="options">
+                <div class="option" data-value="ja">Ja</div>
+                <div class="option" data-value="nein">Nein</div>
+            </div>
+            <button id="next4" disabled>Ergebnis anzeigen</button>
+        </div>
+
+        <!-- Ergebnis -->
+        <div class="result" id="resultGood">
+            <div class="result-title">✅ VOLLER EINSATZ EMPFOHLEN!</div>
+            <ul class="result-list">
+                <li>SiteVision für kritische Koordinationen in Phase 5.2 nutzen.</li>
+                <li>Klaren Use‑Case definieren (z.B. wöchentliche AR‑gestützte Bauabstimmung).</li>
+                <li>Team begleitend schulen.</li>
+                <li>Erfolg messen: weniger Rückfragen, schnellere Entscheidungen.</li>
+            </ul>
+            <button onclick="window.location.reload()">Nochmal prüfen</button>
+        </div>
+
+        <div class="result" id="resultBad">
+            <div class="result-title">⚠️ NOCH NICHT BEREIT – ZUERST DIESE SCHRITTE:</div>
+            <ul class="result-list" id="badList"></ul>
+            <button onclick="window.location.reload()">Nochmal prüfen</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = document.querySelectorAll('.question');
+        const currentSpan = document.getElementById('current');
+        let answers = [];
+
+        // Optionen auswählen
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const questionDiv = this.closest('.question');
+                questionDiv.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                const nextButton = questionDiv.querySelector('button');
+                nextButton.disabled = false;
+            });
+        });
+
+        // Nächste Frage
+        document.getElementById('next1').addEventListener('click', () => navigate(1, 2));
+        document.getElementById('next2').addEventListener('click', () => navigate(2, 3));
+        document.getElementById('next3').addEventListener('click', () => navigate(3, 4));
+        document.getElementById('next4').addEventListener('click', showResult);
+
+        function navigate(from, to) {
+            const selected = document.querySelector(`#q${from} .option.selected`);
+            if (!selected) return;
+            answers[from-1] = selected.dataset.value;
+            questions.forEach(q => q.classList.remove('active'));
+            document.getElementById(`q${to}`).classList.add('active');
+            currentSpan.textContent = to;
+        }
+
+        function showResult() {
+            const selected = document.querySelector(`#q4 .option.selected`);
+            if (!selected) return;
+            answers[3] = selected.dataset.value;
+
+            questions.forEach(q => q.style.display = 'none');
+            currentSpan.parentElement.style.display = 'none';
+
+            // Prüfe, ob alle 4 mit JA beantwortet wurden
+            if (answers.every(a => a === 'ja')) {
+                document.getElementById('resultGood').style.display = 'block';
+            } else {
+                const reasons = [];
+                if (answers[0] !== 'ja') reasons.push('Zuerst BIM‑Datenqualität und ‑Pflege etablieren.');
+                if (answers[1] !== 'ja') reasons.push('Besprechungs‑ und Freigabeprozesse anpassen, um AR zu integrieren.');
+                if (answers[2] !== 'ja') reasons.push('Team schulen und „Champions“ identifizieren, um Akzeptanz zu steigern.');
+                if (answers[3] !== 'ja') reasons.push('Für weniger komplexe Koordination sind herkömmliche Methoden (2D‑Pläne, BIM‑Viewer) ausreichend.');
+                
+                document.getElementById('badList').innerHTML = reasons.map(r => `<li>${r}</li>`).join('');
+                document.getElementById('resultBad').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
