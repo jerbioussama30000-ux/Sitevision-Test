@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteVision‑Check – Trimble SiteVision Einsatzbereitschaft</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0, 82, 163, 0.15);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #005aa3, #00a8e8);
+        }
+        h1 {
+            color: #005aa3;
+            font-size: 26px;
+            margin: 0 0 10px 0;
+            text-align: center;
+            font-weight: 700;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .welcome-page, .question, .result {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .welcome-page.active, .question.active, .result.active {
+            display: block;
+        }
+        .welcome-content {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .welcome-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: #005aa3;
+        }
+        .welcome-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 40px;
+        }
+        .welcome-list {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .welcome-list li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #333;
+            line-height: 1.4;
+        }
+        .question-number {
+            display: inline-block;
+            background: #005aa3;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .option {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+            font-size: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .option.yes:hover {
+            border-color: #2ecc71;
+            background: #f0f9f0;
+        }
+        .option.no:hover {
+            border-color: #e74c3c;
+            background: #fef0f0;
+        }
+        .option.selected.yes {
+            border-color: #2ecc71;
+            background: #2ecc71;
+            color: white;
+        }
+        .option.selected.no {
+            border-color: #e74c3c;
+            background: #e74c3c;
+            color: white;
+        }
+        .icon {
+            font-size: 32px;
+        }
+        .recommendation {
+            display: none;
+            background: #f8f9fa;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            animation: slideIn 0.5s;
+        }
+        .recommendation.active {
+            display: block;
+        }
+        .recommendation h3 {
+            color: #e67e22;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .recommendation ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .recommendation li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 16px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        .btn-primary {
+            background: #005aa3;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #004080;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #f1f1f1;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e1e1e1;
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .progress-container {
+            margin-bottom: 30px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #005aa3, #00a8e8);
+            width: 0%;
+            transition: width 0.5s;
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+        }
+        .points-display {
+            background: linear-gradient(135deg, #005aa3, #00a8e8);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            display: none;
+        }
+        .points-display.active {
+            display: block;
+        }
+        .points-value {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1;
+            margin: 10px 0;
+        }
+        .points-label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .result-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .result-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .result-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .result-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .result-details {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .recommendations-list {
+            padding-left: 20px;
+        }
+        .recommendations-list li {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            .options {
+                flex-direction: column;
+            }
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- STARTSEITE -->
+        <div class="welcome-page active" id="welcomePage">
+            <div class="welcome-content">
+                <div class="welcome-icon">🚀</div>
+                <h1>Willkommen zum SiteVision‑Bereitschafts‑Check</h1>
+                <div class="subtitle">Analysieren Sie Ihre Einsatzbereitschaft für Trimble SiteVision</div>
+                
+                <div class="welcome-text">
+                    Dieser Fragebogen hilft Ihnen zu bewerten, ob Ihr Unternehmen und Ihr Projekt bereit sind, 
+                    Trimble SiteVision in der Bauabstimmung erfolgreich einzusetzen.
+                </div>
+                
+                <div class="welcome-list">
+                    <p><strong>Was Sie erwartet:</strong></p>
+                    <ul>
+                        <li>📊 <strong>4 Schlüsselfragen</strong> zu BIM, Prozessen, Team und Projektkomplexität</li>
+                        <li>🎯 <strong>Persönliche Empfehlungen</strong> bei jeder Antwort</li>
+                        <li>📈 <strong>Live-Bereitschaftsanalyse</strong> während des Tests</li>
+                        <li>💡 <strong>Maßgeschneiderte Handlungsempfehlungen</strong> am Ende</li>
+                    </ul>
+                </div>
+                
+                <div class="welcome-text">
+                    Der Test dauert nur <strong>2-3 Minuten</strong> und liefert Ihnen wertvolle Erkenntnisse für Ihre Digitalisierungsstrategie.
+                </div>
+                
+                <div class="buttons">
+                    <button class="btn-primary" id="startButton">Jetzt Test starten</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FRAGENTEIL -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="currentStep">Frage 1 von 4</span>
+                <span id="pointsText">Punkte: 0/100</span>
+            </div>
+        </div>
+        
+        <div class="points-display" id="pointsDisplay">
+            <div class="points-label">Aktuelle Bereitschaft</div>
+            <div class="points-value" id="pointsValue">0%</div>
+        </div>
+
+        <!-- Frage 1 -->
+        <div class="question" id="q1">
+            <div class="question-text">
+                <span class="question-number">1</span>
+                Haben Sie ein aktuelles, qualitativ hochwertiges BIM‑Modell (IFC) für Ihr Projekt?
+            </div>
+            <div class="options">
+                <div class="option yes" data-value="yes" data-points="25">
+                    <span class="icon">✅</span>
+                    <span>Ja, BIM-Modell vorhanden</span>
+                </div>
+                <div class="option no" data-value="no" data-points="0">
+                    <span class="icon">❌</span>
+                    <span>Nein, kein BIM-Modell</span>
+                </div>
+            </div>
+            <div class="recommendation" id="rec1">
+                <h3>🛠️ Empfehlung für Frage 1:</h3>
+                <ul>
+                    <li>Zuerst BIM‑Datenqualität und ‑Pflege etablieren</li>
+                    <li>BIM-Koordinator für Modellpflege beauftragen</li>
+                    <li>Regelmäßige Model-Updates im Projektvertrag festlegen</li>
+                    <li>Mit einem kleinen Pilotprojekt starten</li>
+                </ul>
+            </div>
+            <div class="buttons">
+                <button class="btn-primary" id="next1" disabled>Weiter zur Frage 2</button>
+            </div>
+        </div>
+
+        <!-- Frage 2 -->
+        <div class="question" id="q2">
+            <div class="question-text">
+                <span class="question-number">2</span>
+                Können Sie SiteVision in Ihre bestehenden Bauabstimmungsprozesse integrieren?
+            </div>
+            <div class="options">
+                <div class="option yes" data-value="yes" data-points="25">
+                    <span class="icon">✅</span>
+                    <span>Ja, wir können es einbinden</span>
+                </div>
+                <div class="option no" data-value="no" data-points="0">
+                    <span class="icon">❌</span>
+                    <span>Nein, Prozesse müssen geändert werden</span>
+                </div>
+            </div>
+            <div class="recommendation" id="rec2">
+                <h3>📋 Empfehlung für Frage 2:</h3>
+                <ul>
+                    <li>Besprechungs‑ und Freigabeprozesse anpassen</li>
+                    <li>AR-spezifische Agenda-Punkte einführen</li>
+                    <li>Verantwortlichkeiten für AR-Koordination definieren</li>
+                    <li>Pilot-Workshop mit allen Beteiligten durchführen</li>
+                </ul>
+            </div>
+            <div class="buttons">
+                <button class="btn-secondary" id="back2">Zurück zu Frage 1</button>
+                <button class="btn-primary" id="next2" disabled>Weiter zur Frage 3</button>
+            </div>
+        </div>
+
+        <!-- Frage 3 -->
+        <div class="question" id="q3">
+            <div class="question-text">
+                <span class="question-number">3</span>
+                Ist Ihr Team digital affin und bereit für ein neues AR‑Tool?
+            </div>
+            <div class="options">
+                <div class="option yes" data-value="yes" data-points="25">
+                    <span class="icon">✅</span>
+                    <span>Ja, Team ist offen für Neues</span>
+                </div>
+                <div class="option no" data-value="no" data-points="0">
+                    <span class="icon">❌</span>
+                    <span>Nein, Widerstände vorhanden</span>
+                </div>
+            </div>
+            <div class="recommendation" id="rec3">
+                <h3>👥 Empfehlung für Frage 3:</h3>
+                <ul>
+                    <li>Team schulen und „Digital Champions“ identifizieren</li>
+                    <li>Erfolgserlebnisse schaffen (Quick Wins)</li>
+                    <li>Zielgruppen-spezifische Schulungen anbieten</li>
+                    <li>Feedback-Mechanismen etablieren</li>
+                </ul>
+            </div>
+            <div class="buttons">
+                <button class="btn-secondary" id="back3">Zurück zu Frage 2</button>
+                <button class="btn-primary" id="next3" disabled>Weiter zur Frage 4</button>
+            </div>
+        </div>
+
+        <!-- Frage 4 -->
+        <div class="question" id="q4">
+            <div class="question-text">
+                <span class="question-number">4</span>
+                Gibt es räumlich komplexe Koordinationsprobleme auf Ihrer Baustelle?
+            </div>
+            <div class="options">
+                <div class="option yes" data-value="yes" data-points="25">
+                    <span class="icon">✅</span>
+                    <span>Ja, komplexe räumliche Abhängigkeiten</span>
+                </div>
+                <div class="option no" data-value="no" data-points="0">
+                    <span class="icon">❌</span>
+                    <span>Nein, einfache Koordinationsaufgaben</span>
+                </div>
+            </div>
+            <div class="recommendation" id="rec4">
+                <h3>🏗️ Empfehlung für Frage 4:</h3>
+                <ul>
+                    <li>Für einfache Koordination sind herkömmliche Methoden ausreichend</li>
+                    <li>Kosten-Nutzen-Analyse durchführen</li>
+                    <li>Mit einem Pilotprojekt in komplexerem Umfeld starten</li>
+                    <li>Alternative Tools (BIM-Viewer) prüfen</li>
+                </ul>
+            </div>
+            <div class="buttons">
+                <button class="btn-secondary" id="back4">Zurück zu Frage 3</button>
+                <button class="btn-primary" id="next4" disabled>Ergebnis anzeigen</button>
+            </div>
+        </div>
+
+        <!-- ERGEBNISSEITE -->
+        <div class="result" id="result">
+            <div class="result-header">
+                <div class="result-icon" id="resultIcon">🎯</div>
+                <div class="result-title" id="resultTitle"></div>
+                <div class="result-subtitle" id="resultSubtitle"></div>
+            </div>
+            
+            <div class="result-details">
+                <div class="points-display active">
+                    <div class="points-label">Ihre SiteVision-Bereitschaft</div>
+                    <div class="points-value" id="finalPoints">0%</div>
+                </div>
+                
+                <div id="resultRecommendations">
+                    <!-- Empfehlungen werden hier eingefügt -->
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn-secondary" id="restart">Neuen Test starten</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let totalPoints = 0;
+        const totalPossiblePoints = 100;
+        const answers = {};
+        const recommendations = {
+            q1: "Zuerst BIM‑Datenqualität und ‑Pflege etablieren. Mit einem kleinen Pilotprojekt starten.",
+            q2: "Besprechungs‑ und Freigabeprozesse anpassen, um AR zu integrieren. Verantwortlichkeiten definieren.",
+            q3: "Team schulen und „Champions“ identifizieren, um Akzeptanz zu steigern. Quick Wins schaffen.",
+            q4: "Für weniger komplexe Koordination sind herkömmliche Methoden (2D‑Pläne, BIM‑Viewer) ausreichend. Kosten-Nutzen prüfen."
+        };
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progressFill');
+            const progressPercent = ((currentQuestion - 1) / 4) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+            
+            document.getElementById('currentStep').textContent = `Frage ${currentQuestion} von 4`;
+            document.getElementById('pointsText').textContent = `Punkte: ${totalPoints}/${totalPossiblePoints}`;
+            
+            const pointsDisplay = document.getElementById('pointsDisplay');
+            const pointsValue = document.getElementById('pointsValue');
+            const readinessPercent = Math.round((totalPoints / totalPossiblePoints) * 100);
+            
+            pointsValue.textContent = `${readinessPercent}%`;
+            
+            if (currentQuestion > 1) {
+                pointsDisplay.classList.add('active');
+            } else {
+                pointsDisplay.classList.remove('active');
+            }
+        }
+
+        function showQuestion(questionNum) {
+            // Verstecke alle Seiten
+            document.getElementById('welcomePage').classList.remove('active');
+            document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+            document.getElementById('result').classList.remove('active');
+            
+            // Zeige Progress-Bar an (außer bei Startseite)
+            if (questionNum > 0) {
+                document.getElementById('progressContainer').style.display = 'block';
+            }
+            
+            // Zeige gewünschte Frage
+            if (questionNum > 0) {
+                document.getElementById(`q${questionNum}`).classList.add('active');
+                currentQuestion = questionNum;
+                updateProgress();
+            }
+        }
+
+        function selectOption(option) {
+            const questionDiv = option.closest('.question');
+            questionDiv.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            
+            const points = parseInt(option.dataset.points);
+            const questionId = questionDiv.id;
+            answers[questionId] = { value: option.dataset.value, points };
+            
+            // Update total points
+            totalPoints = 0;
+            Object.values(answers).forEach(ans => {
+                totalPoints += ans.points;
+            });
+            
+            // Enable next button
+            const nextButton = questionDiv.querySelector('.btn-primary');
+            nextButton.disabled = false;
+            
+            // Show recommendation if answer is "no"
+            const recommendation = document.getElementById(`rec${questionId.substring(1)}`);
+            if (option.dataset.value === 'no') {
+                recommendation.classList.add('active');
+            } else {
+                recommendation.classList.remove('active');
+            }
+            
+            updateProgress();
+        }
+
+        function showResult() {
+            const readinessPercent = Math.round((totalPoints / totalPossiblePoints) * 100);
+            const resultDiv = document.getElementById('result');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultSubtitle = document.getElementById('resultSubtitle');
+            const finalPoints = document.getElementById('finalPoints');
+            const resultRecs = document.getElementById('resultRecommendations');
+            
+            // Verstecke Fragen, zeige Ergebnis
+            document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+            resultDiv.classList.add('active');
+            
+            finalPoints.textContent = `${readinessPercent}%`;
+            
+            // Bestimme Ergebnisstufe
+            let recommendationsHTML = '<h3 style="margin-top: 20px; color: #005aa3;">📋 Spezifische Empfehlungen:</h3><ul class="recommendations-list">';
+            
+            // Füge spezifische Empfehlungen basierend auf Antworten hinzu
+            Object.keys(answers).forEach(qId => {
+                if (answers[qId].value === 'no') {
+                    recommendationsHTML += `<li><strong>Frage ${qId.substring(1)}:</strong> ${recommendations[qId]}</li>`;
+                }
+            });
+            
+            if (readinessPercent >= 75) {
+                resultIcon.textContent = '🚀';
+                resultTitle.textContent = 'VOLLER EINSATZ EMPFOHLEN!';
+                resultSubtitle.textContent = 'Ihre Voraussetzungen sind ideal für Trimble SiteVision';
+                recommendationsHTML += '<li><strong>Nächste Schritte:</strong> SiteVision für kritische Koordinationen in der Bauabstimmung nutzen. Klaren Use‑Case definieren (z.B. wöchentliche AR‑gestützte Bauabstimmung). Erfolg messen: weniger Rückfragen, schnellere Entscheidungen.</li>';
+            } else if (readinessPercent >= 50) {
+                resultIcon.textContent = '⚠️';
+                resultTitle.textContent = 'TEILWEISE BEREIT – MIT VORBEREITUNG';
+                resultSubtitle.textContent = 'Einige Anpassungen sind noch notwendig';
+                recommendationsHTML += '<li><strong>Nächste Schritte:</strong> Beginnen Sie mit einem Pilotprojekt in einem kleinen, gut geeigneten Bereich. Sammeln Sie Erfahrungen und passen Sie dann Ihre Prozesse an.</li>';
+            } else if (readinessPercent >= 25) {
+                resultIcon.textContent = '🔄';
+                resultTitle.textContent = 'BEDINGT BEREIT – GRUNDLEGENDE ANPASSUNGEN NÖTIG';
+                resultSubtitle.textContent = 'Bauen Sie zunächst die Grundvoraussetzungen auf';
+                recommendationsHTML += '<li><strong>Nächste Schritte:</strong> Konzentrieren Sie sich auf die grundlegende Digitalisierung (BIM, Prozesse) bevor Sie an AR denken. Ein Jahr Vorbereitungszeit ist realistisch.</li>';
+            } else {
+                resultIcon.textContent = '⏸️';
+                resultTitle.textContent = 'NOCH NICHT BEREIT – FOKUS AUF BASISARBEIT';
+                resultSubtitle.textContent = 'Konzentrieren Sie sich zuerst auf grundlegende Digitalisierung';
+                recommendationsHTML += '<li><strong>Nächste Schritte:</strong> Starten Sie mit der Einführung von BIM und digitalen Prozessen. AR sollte erst in 1-2 Jahren auf der Agenda stehen.</li>';
+            }
+            
+            recommendationsHTML += '</ul>';
+            resultRecs.innerHTML = recommendationsHTML;
+            
+            // Verstecke Progress-Bar
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('pointsDisplay').style.display = 'none';
+        }
+
+        // Event Listeners für Optionen
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', () => selectOption(option));
+        });
+
+        // Start Button
+        document.getElementById('startButton').addEventListener('click', () => {
+            showQuestion(1);
+        });
+
+        // Navigation Buttons
+        document.getElementById('next1').addEventListener('click', () => showQuestion(2));
+        document.getElementById('next2').addEventListener('click', () => showQuestion(3));
+        document.getElementById('next3').addEventListener('click', () => showQuestion(4));
+        document.getElementById('next4').addEventListener('click', showResult);
+
+        // Back Buttons
+        document.getElementById('back2').addEventListener('click', () => showQuestion(1));
+        document.getElementById('back3').addEventListener('click', () => showQuestion(2));
+        document.getElementById('back4').addEventListener('click', () => showQuestion(3));
+
+        // Restart Button
+        document.getElementById('restart').addEventListener('click', () => {
+            location.reload();
+        });
+
+        // Initialisiere (Startseite ist bereits aktiv)
+    </script>
+</body>
+</html>
